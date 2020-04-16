@@ -6,7 +6,7 @@ import hashlib
 
 app = Flask(__name__)
 
-myclient=pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+myclient=pymongo.MongoClient("mongodb://user_mongodb:27017/")
 mydb=myclient["USER"]
 user=mydb["users"]
 
@@ -75,7 +75,7 @@ def db_read():
 		for x in user.find():
 			result.append(x["username"])
 		return jsonify({"output":result})
-	elif((where=='INS' or where=='DEL') and (column=="user" or column=="ride")):
+	elif((where=='INS' or where=='DEL' or where=='INS1') and (column=="user" or column=="ride")):
 		y=user.find_one(dataDict["data"])
 		if(type(y)==type(None)):
 			return str(1)
@@ -100,5 +100,6 @@ def db_write():
 		output={"name":new_framework["username"],"password":new_framework["password"]}
 		return(jsonify({"result":output}))
 		
-if __name__ == '__main__':  
-    app.run(host='0.0.0.0',port='8000',debug=True)
+if __name__ == '__main__':      	
+	app.run(host='0.0.0.0',port='8000',debug=True)
+	print("HELLO")

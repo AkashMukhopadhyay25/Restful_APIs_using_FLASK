@@ -6,7 +6,7 @@ import hashlib
 
 app = Flask(__name__)
 
-myclient=pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+myclient=pymongo.MongoClient("mongodb://ride_mongodb:27017/")
 mydb=myclient["RIDE"]
 ride=mydb["rides"]
 
@@ -18,7 +18,7 @@ def add_rides():
 	ride_id=request.json['id']
 	username=request.json['created_by']
 	d["data"]={"username":username}
-	query=requests.post('http://localhost:8000/api/v1/db/read',data=json.dumps(d))
+	query=requests.post('http://user_service:8000/api/v1/db/read',data=json.dumps(d))
 	if(query.text=="0"):
 		d["data"]={"id":ride_id}
 		query=requests.post('http://localhost:8080/api/v1/db/read',data=json.dumps(d))
@@ -33,8 +33,7 @@ def add_rides():
 		else:
 			return("",400)
 	else:
-		return("",400)
-
+		return("",400)	
 
 @app.route('/api/v1/rides/<source>/<destination>',methods=['GET'])
 def print_rides(source,destination):
@@ -79,10 +78,10 @@ def add_usernames(ride_id):
 	d["data"]={"id":ride_id}
 	d["work"]="INS1"
 	query=requests.post('http://localhost:8080/api/v1/db/read',data=json.dumps(d))
-	if(query.text=='1'):
+	if(query.text=="1"):
 		username=request.json['username']
 		d["data"]={"username":username}
-		query=requests.post('http://localhost:8000/api/v1/db/read',data=json.dumps(d))
+		query=requests.post('http://user_service:8000/api/v1/db/read',data=json.dumps(d))
 		if(query.text=="0"):
 			d["data"]={"id":ride_id,"username":username}
 			query=requests.post('http://localhost:8080/api/v1/db/write',data=json.dumps(d))
@@ -108,7 +107,7 @@ def db_read():
 	where=dataDict["work"]
 	if(column=="ride"):
 		y=ride.find_one(dataDict["data"])
-		if(type(y)!=type(None) and (where=='DEL' or where=='INS')):
+		if(type(y)!=type(None) and (where=='DEL' or where=='INS1' or where=='INS')):
 			return(str(1))
 		elif(type(y)!=type(None) and where=='LIST'):
 			l={}
