@@ -103,6 +103,12 @@ def clear_db():
 	return({},200)
 
 
+@app.route('/api/v1/rides/count',methods=['GET'])
+def count_entries():
+	n=ride.count()
+	return (str(n))
+
+
 @app.route('/api/v1/db/read',methods=['POST'])
 def db_read():
 	dataDict=json.loads(request.data)

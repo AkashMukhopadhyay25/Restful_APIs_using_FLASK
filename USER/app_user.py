@@ -61,6 +61,10 @@ def clear_db():
 		return({},400)
 	x=user.delete_many({})
 	return({},200)
+@app.route('/api/v1/users/count',methods=['GET'])
+def count():
+	n=user.count()
+	return (str(n))
 
 @app.route('/api/v1/db/read',methods=['POST'])
 def db_read():
