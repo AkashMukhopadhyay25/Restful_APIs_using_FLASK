@@ -3,6 +3,7 @@ import requests
 import json
 import pymongo
 import hashlib
+import datetime
 
 app = Flask(__name__)
 
@@ -23,7 +24,9 @@ def add_rides():
 		d["data"]={"id":ride_id}
 		query=requests.post('http://localhost:8080/api/v1/db/read',data=json.dumps(d))
 		if(query.text=="0"):
-			timestamp=request.json['timestamp']
+			now = datetime.datetime.now()
+			s=now.strftime("%Y-%m-%d:%H:%M:%S")
+			timestamp=s
 			source=request.json['source']
 			destination=request.json['destination']
 			d["work"]="INS2"
