@@ -9,9 +9,28 @@ app = Flask(__name__)
 myclient=pymongo.MongoClient("mongodb://user_mongodb:27017/")
 mydb=myclient["USER"]
 user=mydb["users"]
+counts=mydb["counts"]
+
+def increment_count():
+	y=counts.find({})
+	found = 0
+	for i in y:
+		found=1
+		break
+	if found == 0:
+		counts.insert_one({"id":"1","c":0})
+	else:
+		y=counts.find_one({"id":"1"})
+		value=y["c"]
+		value=value+1
+		nv={"$set":{"c":value}}
+		counts.update({"id":"1"},nv)
+		return value
+
 
 @app.route('/api/v1/users',methods=['PUT']) 
 def add_framework():
+	increment_count()
 	username = request.json['username']
 	password = request.json['password']
 	d={}
@@ -28,9 +47,21 @@ def add_framework():
 	else:
 		return ({},400)
 	
+@app.route('/api/v1/_count',methods=['GET'])
+def get_count():
+	p=counts.find_one({})
+	return str(p["c"])
+
+
+@app.route('/api/v1/_count',methods=['DELETE'])
+def reset_count():
+	nv={"$set":{"c":0}}
+	counts.update({"id":"1"},nv)
+	return(dict({}))
 
 @app.route('/api/v1/users/<username>',methods=['DELETE'])
 def delete_value(username):
+	increment_count()
 	d={}
 	d["column_name"]="user"
 	d["data"]={"username":username}
@@ -45,6 +76,7 @@ def delete_value(username):
 
 @app.route('/api/v1/users',methods=['GET'])
 def list_users():
+	increment_count()
 	d={}
 	d["column_name"]="user"
 	d["work"]='LIST'
@@ -56,15 +88,13 @@ def list_users():
 
 @app.route('/api/v1/db/clear',methods=['POST'])
 def clear_db():
+	increment_count()
 	x=user.find_one()
 	if(type(x)==type(None)):
 		return({},400)
 	x=user.delete_many({})
 	return({},200)
-@app.route('/api/v1/users/count',methods=['GET'])
-def count():
-	n=user.count()
-	return (str(n))
+
 
 @app.route('/api/v1/db/read',methods=['POST'])
 def db_read():

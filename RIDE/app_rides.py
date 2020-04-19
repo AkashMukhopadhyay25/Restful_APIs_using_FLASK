@@ -10,9 +10,40 @@ app = Flask(__name__)
 myclient=pymongo.MongoClient("mongodb://ride_mongodb:27017/")
 mydb=myclient["RIDE"]
 ride=mydb["rides"]
+counts=mydb["counts"]
+
+def increment_count():
+	y=counts.find({})
+	found = 0
+	for i in y:
+		found=1
+		break
+	if found == 0:
+		counts.insert_one({"id":"1","c":0})
+	else:
+		y=counts.find_one({"id":"1"})
+		value=y["c"]
+		value=value+1
+		nv={"$set":{"c":value}}
+		counts.update({"id":"1"},nv)
+		return value
+
+@app.route('/api/v1/_count',methods=['GET'])
+def get_count():
+	p=counts.find_one({})
+	return str(p["c"])
+
+
+@app.route('/api/v1/_count',methods=['DELETE'])
+def reset_count():
+	nv={"$set":{"c":0}}
+	counts.update({"id":"1"},nv)
+	return(dict({}))
+
 
 @app.route('/api/v1/rides',methods=['POST'])
 def add_rides():
+	increment_count()
 	d={}
 	d["column_name"]="ride"
 	d["work"]="INS"
@@ -40,6 +71,7 @@ def add_rides():
 
 @app.route('/api/v1/rides/<source>/<destination>',methods=['GET'])
 def print_rides(source,destination):
+	increment_count()
 	d={}
 	d["column_name"]="ride"
 	d["data"]={"source":source,"destination":destination}
@@ -51,6 +83,7 @@ def print_rides(source,destination):
 
 @app.route('/api/v1/rides/<ride_id>',methods=['GET'])
 def list_ride(ride_id):
+	increment_count()
 	d={}
 	d["column_name"]="ride"
 	d["data"]={"id":ride_id}
@@ -62,6 +95,7 @@ def list_ride(ride_id):
   
 @app.route('/api/v1/rides/<ride_id>',methods=['DELETE'])
 def delete_ride(ride_id):
+	increment_count()
 	d={}
 	d["column_name"]="ride"
 	d["data"]={"id":ride_id}
@@ -76,6 +110,7 @@ def delete_ride(ride_id):
 
 @app.route('/api/v1/rides/<ride_id>',methods=['POST'])
 def add_usernames(ride_id):
+	increment_count()
 	d={}
 	d["column_name"]="ride"
 	d["data"]={"id":ride_id}
@@ -96,6 +131,7 @@ def add_usernames(ride_id):
 
 @app.route('/api/v1/db/clear',methods=['POST'])
 def clear_db():
+	increment_count()
 	x=ride.find_one()
 	if(type(x)==type(None)):
 		return({},400)
@@ -105,6 +141,7 @@ def clear_db():
 
 @app.route('/api/v1/rides/count',methods=['GET'])
 def count_entries():
+	increment_count()
 	n=ride.count()
 	return (str(n))
 
