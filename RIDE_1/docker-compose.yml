@@ -1,0 +1,15 @@
+version: "3"
+services :
+  ride_service:
+    container_name: rides 
+    restart: always
+    build: .
+    image: rides:latest
+    ports:
+      - "8080:8080"
+    links:
+      - ride_mongodb
+  ride_mongodb:
+    image: "mongo"
+    ports:
+      - "27000:27017"

@@ -1,0 +1,15 @@
+version: "3"
+services :
+  user_service:
+    container_name: users 
+    restart: always
+    build: .
+    image: users:latest
+    ports:
+      - "8000:8000"
+    links:
+      - user_mongodb
+  user_mongodb:
+    image: "mongo"
+    ports:
+      - "27005:27017"
