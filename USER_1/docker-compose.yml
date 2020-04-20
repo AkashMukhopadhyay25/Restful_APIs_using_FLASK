@@ -6,7 +6,7 @@ services :
     build: .
     image: users:latest
     ports:
-      - "8000:8000"
+      - "8000:80"
     links:
       - user_mongodb
   user_mongodb:
