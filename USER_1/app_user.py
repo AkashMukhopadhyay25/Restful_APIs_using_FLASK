@@ -18,7 +18,7 @@ def increment_count():
 		found=1
 		break
 	if found == 0:
-		counts.insert_one({"id":"1","c":0})
+		counts.insert_one({"id":"1","c":1})
 	else:
 		y=counts.find_one({"id":"1"})
 		value=y["c"]
@@ -77,13 +77,27 @@ def delete_value(username):
 @app.route('/api/v1/users',methods=['GET'])
 def list_users():
 	increment_count()
-	d={}
-	d["column_name"]="user"
-	d["work"]='LIST'
-	query=requests.post('http://localhost:8000/api/v1/db/read',data=json.dumps(d))
-	if(query.text=="1"):
-		return("",400)
-	return(query.text,200)
+	dataDict=json.loads(request.data)
+	if(not dataDict):
+		d={}
+		d["column_name"]="user"
+		d["work"]='LIST'
+		query=requests.post('http://localhost:8000/api/v1/db/read',data=json.dumps(d))
+		if(query.text=="1"):
+			return("",400)
+		else:
+			return(query.text,200)
+	else:
+		d={}
+		d["data"]=dataDict["data"]
+		d["column_name"]="user"
+		d["work"]='GET'
+		query=requests.post('http://localhost:8000/api/v1/db/read',data=json.dumps(d))
+		if(query.text=="1"):
+			return("",400)
+		else:
+			return(str(0),200)
+	
 	
 
 @app.route('/api/v1/db/clear',methods=['POST'])
@@ -109,7 +123,7 @@ def db_read():
 		for x in user.find():
 			result.append(x["username"])
 		return jsonify({"output":result})
-	elif((where=='INS' or where=='DEL' or where=='INS1') and (column=="user" or column=="ride")):
+	elif((where=='INS' or where=='DEL' or where=='INS1' or where=='GET') and (column=="user" or column=="ride")):
 		y=user.find_one(dataDict["data"])
 		if(type(y)==type(None)):
 			return str(1)

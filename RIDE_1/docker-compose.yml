@@ -6,10 +6,10 @@ services :
     build: .
     image: rides:latest
     ports:
-      - "8080:80"
+      - "80:8080"
     links:
       - ride_mongodb
   ride_mongodb:
-    image: "mongo"
+    image: mongo:latest
     ports:
       - "27000:27017"

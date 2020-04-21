@@ -19,7 +19,7 @@ def increment_count():
 		found=1
 		break
 	if found == 0:
-		counts.insert_one({"id":"1","c":0})
+		counts.insert_one({"id":"1","c":1})
 	else:
 		y=counts.find_one({"id":"1"})
 		value=y["c"]
@@ -50,7 +50,7 @@ def add_rides():
 	ride_id=request.json['id']
 	username=request.json['created_by']
 	d["data"]={"username":username}
-	query=requests.post('http://user_service:8000/api/v1/db/read',data=json.dumps(d))
+	query=requests.get('http://user_service:8000/api/v1/users',data=json.dumps(d))
 	if(query.text=="0"):
 		d["data"]={"id":ride_id}
 		query=requests.post('http://localhost:8080/api/v1/db/read',data=json.dumps(d))
@@ -119,7 +119,7 @@ def add_usernames(ride_id):
 	if(query.text=="1"):
 		username=request.json['username']
 		d["data"]={"username":username}
-		query=requests.post('http://user_service:8000/api/v1/db/read',data=json.dumps(d))
+		query=requests.post('http://user_service:8000/api/v1/users',data=json.dumps(d))
 		if(query.text=="0"):
 			d["data"]={"id":ride_id,"username":username}
 			query=requests.post('http://localhost:8080/api/v1/db/write',data=json.dumps(d))
